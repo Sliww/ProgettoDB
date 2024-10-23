@@ -7,13 +7,17 @@ const manageErrorMessage = require('../utilities/catchErrorsMessages')
 
 books.get('/books', async (req, res)=>{
 
-    const { pages, pagesSize = 12 } = req.params;
+    const { page = 1, pagesSize = 12 } = req.query;
 
     try {
         const books = await BooksModel
             .find()
             .limit(pagesSize)
-            .skip((pages - 1) * pagesSize )
+            .skip((page - 1) * pagesSize )
+
+            const count = await BooksModel.countDocuments()
+            const totalPages = Math.ceil(count / pagesSize)
+
         
         if(isEmptyArray(books)){
             return res
@@ -28,6 +32,8 @@ books.get('/books', async (req, res)=>{
             .send({
                 statusCode: 200,
                 message: `Books found ${books.length}`,
+                count,
+                totalPages,
                 books
             })
     } catch (error) {
