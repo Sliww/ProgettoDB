@@ -3,7 +3,9 @@ const books = express.Router()
 const BooksModel = require('../models/Bookmodel')
 const isEmptyArray = require('../utilities/checkArraysLength')
 const manageErrorMessage = require('../utilities/catchErrorsMessages')
-
+const validateBookBody = require('../middleware/validateBookBody')
+const validateBookId = require('../middleware/validateBookIdParam')
+//FARE LE CRUD PER I BOOKS! E INSERIRE NELLA POST IL MIDDLEWARE VALIDATEBOOKBODY! 
 
 books.get('/books', async (req, res)=>{
 
