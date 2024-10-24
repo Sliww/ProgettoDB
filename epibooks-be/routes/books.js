@@ -5,9 +5,10 @@ const isEmptyArray = require('../utilities/checkArraysLength')
 const manageErrorMessage = require('../utilities/catchErrorsMessages')
 const validateBookBody = require('../middleware/validateBookBody')
 const validateBookId = require('../middleware/validateBookIdParam')
+const Bookmodel = require('../models/Bookmodel')
 //FARE LE CRUD PER I BOOKS! E INSERIRE NELLA POST IL MIDDLEWARE VALIDATEBOOKBODY! 
 
-books.get('/books', async (req, res)=>{
+books.get('/books', async (req, res) => {
 
     const { page = 1, pagesSize = 12 } = req.query;
 
@@ -15,13 +16,13 @@ books.get('/books', async (req, res)=>{
         const books = await BooksModel
             .find()
             .limit(pagesSize)
-            .skip((page - 1) * pagesSize )
+            .skip((page - 1) * pagesSize)
 
-            const count = await BooksModel.countDocuments()
-            const totalPages = Math.ceil(count / pagesSize)
+        const count = await BooksModel.countDocuments()
+        const totalPages = Math.ceil(count / pagesSize)
 
-        
-        if(isEmptyArray(books)){
+
+        if (isEmptyArray(books)) {
             return res
                 .status(404)
                 .send({
@@ -29,7 +30,7 @@ books.get('/books', async (req, res)=>{
                     message: "Books not Found"
                 })
         }
-        res 
+        res
             .status(200)
             .send({
                 statusCode: 200,
@@ -47,6 +48,32 @@ books.get('/books', async (req, res)=>{
             })
     }
 })
+
+books.get('/books/byasin/:asin', async (req, res) => {
+
+    const { asin } = req.params;
+
+    try {
+        const book = await BooksModel.findOne({ asin })
+        if (!book) {
+            return res.status(404).send({
+                statusCode: 404,
+                message: "No book found"
+            });
+        }
+        res.status(200).send({
+            statusCode: 200,
+            book
+        });
+
+    } catch (error) {
+        res.status(500).send({
+            statusCode: 500,
+            message: manageErrorMessage(error)
+        });
+    }
+});
+
 
 
 
