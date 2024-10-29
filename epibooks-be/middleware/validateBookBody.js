@@ -5,7 +5,7 @@ const validateBookBody = [
     body('asin')
         .isString()
         .notEmpty()
-        .withMessage("Asin is not valid. Must be a string!"),
+        .withMessage("Asin is not valid. Must be a string number!"),
     
     body('title')
         .isString()

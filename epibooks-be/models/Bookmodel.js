@@ -1,11 +1,17 @@
 const mongoose = require('mongoose')
 
-const ALLOWED_CATEGORIES = ["horror", "scifi", "fantasy", "romance", "history"]
-
 const BookSchema = new mongoose.Schema({
     asin: {
         type: String,
-        required: true
+        required: true,
+        unique: true,
+        minLength: 10,
+        validate: {
+            validator: function (v) {
+                return /^[0-9]+$/.test(v);
+            },
+            message: props => `${props.value} non è un ASIN valido!`
+        }
     },
     title: {
         type: String,
@@ -13,7 +19,6 @@ const BookSchema = new mongoose.Schema({
     },
     category: {
         type: String,
-        enum: ALLOWED_CATEGORIES,
         required: true
     },
     price: {

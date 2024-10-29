@@ -1,6 +1,7 @@
 const express = require("express");
 const users = express.Router();
 const UserModel = require("../models/Usersmodel");
+const manageErrorMessage = require("../utilities/catchErrorsMessages");
 
 users.get("/users", async (req, res) => {
   try {
@@ -100,7 +101,7 @@ users.post("/users/create", async (req, res) => {
     const user = await newUser.save();
     res.status(201).send({
       statusCode: 201,
-      message: "User saved successfulluy",
+      message: "User saved successfully",
       user,
     });
   } catch (error) {
@@ -135,7 +136,7 @@ try {
     .status(500)
     .send({
       statusCode: 500,
-      message: "Ops something went wrong"
+      message: manageErrorMessage(error)
     })
 }
 })

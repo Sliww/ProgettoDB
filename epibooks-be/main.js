@@ -1,6 +1,8 @@
 const express = require('express');
 const init = require("./db");
 const cors = require('cors');
+const path = require('path')
+
 require('dotenv').config();
 const usersRoute = require('./routes/users')
 const loginRoute = require('./routes/login')
@@ -15,6 +17,7 @@ const PORT = 4010
 
 const server = express();
 
+server.use('/uploads', express.static(path.join(__dirname, './uploads')))
 server.use(express.json());
 server.use(cors());
 
