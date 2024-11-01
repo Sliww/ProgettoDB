@@ -29,7 +29,11 @@ const BookSchema = new mongoose.Schema({
         type: String,
         required: false,
         default: "https://placehold.co/600x400"
-    }
+    },
+    comments: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "CommentsModel"
+    }]
 }, { timestamps: true, strict: true })
 
 module.exports = mongoose.model("BooksModel", BookSchema, "books")

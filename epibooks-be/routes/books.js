@@ -9,7 +9,7 @@ const manageErrorMessage = require('../utilities/catchErrorsMessages')
 const validateBookBody = require('../middleware/validateBookBody')
 const validateBookId = require('../middleware/validateBookIdParam')
 const Bookmodel = require('../models/Bookmodel')
-const { cloudStorage, internalStorage } = require('../middleware/multer/internalStorage');
+const { cloudStorage, internalStorage } = require('../middleware/multer/internal&cloudStorage');
 
 const upload = multer({storage: internalStorage})
 const cloud = multer({storage: cloudStorage})
@@ -82,10 +82,39 @@ books.get('/books/byasin/:asin', async (req, res) => {
     }
 });
 
+books.get('/books/byid/:id', async (req, res, next)=>{
+
+    const { id } = req.params;
+
+    try {
+        const book = await Bookmodel.findById(id).populate("comments")
+        if(!book){
+            res
+                .status(404)
+                .send({
+                    statusCode: 404,
+                    message: "No book found"
+                })
+        }
+        res 
+            .status(200)
+            .send({
+                statusCode: 200,
+                message: "Book found",
+                book
+            })
+    } catch (error) {
+        res.status(500).send({
+            statusCode: 500,
+            message: manageErrorMessage(error)
+        });
+    }
+})
+
+
+
 books.post('/books/create', async (req, res)=>{
     console.log(req.body);
-
-    
 
     const newBook = new Bookmodel({
         asin: req.body.asin,
@@ -163,6 +192,10 @@ books.post('/books/upload/cloud', cloud.single('img'), async (req, res, next)=>{
     } catch (error) {
         next(error)
     }
+})
+
+books.patch('/books/updateModel', async(req, res, next)=>{
+    await Bookmodel.updateMany({comments: {$exists: false}}, { $set: {comments: []}})
 })
 
 

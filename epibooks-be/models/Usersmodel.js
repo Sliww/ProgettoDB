@@ -51,6 +51,10 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    books: [{
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "BooksModel"
+    }]
   },
   {
     timestamps: true,

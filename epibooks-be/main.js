@@ -7,6 +7,8 @@ require('dotenv').config();
 const usersRoute = require('./routes/users')
 const loginRoute = require('./routes/login')
 const booksRoute = require('./routes/books')
+const commentsRoute = require('./routes/comments')
+
 const routeNotFoundHandler = require('./middleware/routeNotFoundHandler')
 const timeForRequestMiddleware = require('./middleware/timeForRequestMiddleware')
 const lockIpMiddleware = require('./middleware/lockIpMiddleware')
@@ -27,6 +29,7 @@ server.use(timeForRequestMiddleware);
 server.use("/", usersRoute);
 server.use("/", loginRoute);
 server.use("/", booksRoute);
+server.use("/", commentsRoute);
 
 server.use(routeNotFoundHandler);
 
