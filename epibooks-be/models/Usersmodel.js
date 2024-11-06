@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const bcrypt = require("bcrypt");
 const allowedGenders = ["M", "F", "not specified"];
 
 const UserSchema = new mongoose.Schema(
@@ -6,14 +7,14 @@ const UserSchema = new mongoose.Schema(
     name: {
       type: String,
       required: true,
-      minLength: 3,
+      minLength: 2,
       trim: true,
     },
 
     surname: {
       type: String,
       required: true,
-      minLength: 3,
+      minLength: 2,
       trim: true,
     },
 
@@ -51,6 +52,11 @@ const UserSchema = new mongoose.Schema(
       type: String,
       required: false,
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+      required: false,
+    },
     books: [{
       type: mongoose.Schema.Types.ObjectId,
       ref: "BooksModel"
@@ -61,5 +67,17 @@ const UserSchema = new mongoose.Schema(
     strict: true,
   }
 );
+
+UserSchema.pre("save", async function (next) {
+  const user = this;
+  if (!user.isModified("password")) return next();
+  try {
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(user.password, salt);
+    next();
+  } catch (error) {
+    next(error);
+  }
+});
 
 module.exports = mongoose.model("userModel", UserSchema, "users");

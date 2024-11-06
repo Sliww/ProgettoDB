@@ -1,9 +1,12 @@
 const express = require("express");
 const users = express.Router();
 const UserModel = require("../models/Usersmodel");
+const bcrypt = require("bcrypt");
 const manageErrorMessage = require("../utilities/catchErrorsMessages");
+const verifyToken = require("../middleware/verifyToken");
 
-users.get("/users", async (req, res) => {
+
+users.get("/users", verifyToken, async (req, res) => {
   try {
     const users = await UserModel.find();
     if (users.length === 0) {
@@ -87,16 +90,8 @@ users.get('/users/byemail/:email', async(req, res)=> {
 
 users.post("/users/create", async (req, res) => {
   console.log(req.body);
-  const newUser = new UserModel({
-    name: req.body.name,
-    surname: req.body.surname,
-    dob: req.body.dob,
-    email: req.body.email,
-    password: req.body.password,
-    username: req.body.username,
-    gender: req.body.gender,
-    address: req.body.address,
-  });
+const newUser = new UserModel(req.body);
+
   try {
     const user = await newUser.save();
     res.status(201).send({
@@ -107,7 +102,7 @@ users.post("/users/create", async (req, res) => {
   } catch (error) {
     res.status(500).send({
       statusCode: 500,
-      message: "Oops, something went wrong",
+      message: manageErrorMessage(error),
     });
   }
 });

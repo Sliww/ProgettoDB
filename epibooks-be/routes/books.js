@@ -47,6 +47,7 @@ books.get('/books', async (req, res) => {
                 totalPages,
                 books
             })
+            
     } catch (error) {
         res
             .status(500)

@@ -1,5 +1,7 @@
 const express = require('express');
 const login = express.Router();
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const Usersmodel = require('../models/Usersmodel');
 
 const isPassValid = (userPass, reqPass) => {
@@ -10,40 +12,48 @@ const isPassValid = (userPass, reqPass) => {
     }
 };
 
-login.post('/login', async (req, res) => {
+login.post('/login', async (req, res, next) => {
     try {
         const user = await Usersmodel.findOne({ email: req.body.email })
         if (!user) {
-            return res
-                .status(404)
-                .send({
-                    statusCode: 404,
-                    message: "Utente non trovato con l'email fornita"
-                })
+            return res.status(404).send({
+                statusCode: 404,
+                message: "User not found with the provided email or password"
+            });
         }
-        const checkPass = isPassValid(user.password, req.body.password);
-
+        
+        const checkPass = await bcrypt.compare(req.body.password, user.password);
         if (!checkPass) {
-            res
-                .status(403)
-                .send({
-                    statusCode: 403,
-                    message: "Invalid password"
-                })
+            return res.status(401).send({
+                statusCode: 401,
+                message: "Invalid password or email"
+            });
         }
-        res
+
+        const token = jwt.sign({ 
+            email: user.email,
+            userId: user._id,
+            isActive: user.isActive,
+            dob: user.dob,
+            createdAt: user.createdAt
+        }, process.env.JWT_SECRET, {expiresIn: "15m"});
+
+        return res
+            .header("Authorization", token)
             .status(200)
             .send({
                 statusCode: 200,
-                message: "Logged"
-            })
+                message: "Logged in successfully",
+                token
+            });
 
     } catch (error) {
-        res.status(500).send({
+        return res.status(500).send({
             statusCode: 500,
             message: "Oops, something went wrong",
+            error: error.message
         });
     }
-})
+});
 
 module.exports = login;
