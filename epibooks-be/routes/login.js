@@ -4,53 +4,50 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const Usersmodel = require('../models/Usersmodel');
 
-const isPassValid = (userPass, reqPass) => {
-    if (userPass !== reqPass) {
-        return false
-    } else {
-        return true
-    }
-};
+login.post('/login', async (req, res) => {
+    const { email, password } = req.body;
 
-login.post('/login', async (req, res, next) => {
     try {
-        const user = await Usersmodel.findOne({ email: req.body.email })
+        const user = await Usersmodel.findOne({ email });
         if (!user) {
-            return res.status(404).send({
-                statusCode: 404,
-                message: "User not found with the provided email or password"
+            return res.status(401).send({
+                statusCode: 401,
+                message: "Invalid credentials"
             });
         }
         
-        const checkPass = await bcrypt.compare(req.body.password, user.password);
-        if (!checkPass) {
+        const isPasswordValid = await bcrypt.compare(password, user.password);
+        if (!isPasswordValid) {
             return res.status(401).send({
                 statusCode: 401,
-                message: "Invalid password or email"
+                message: "Invalid credentials"
             });
         }
 
         const token = jwt.sign({ 
             email: user.email,
             userId: user._id,
+            name: user.name,
+            surname: user.surname,
             isActive: user.isActive,
             dob: user.dob,
             createdAt: user.createdAt
-        }, process.env.JWT_SECRET, {expiresIn: "15m"});
+        }, process.env.JWT_SECRET, {
+            expiresIn: "15m"
+        });
 
-        return res
-            .header("Authorization", token)
-            .status(200)
-            .send({
+        res.header("Authorization", token)
+           .status(200)
+           .send({
                 statusCode: 200,
                 message: "Logged in successfully",
                 token
-            });
+           });
 
     } catch (error) {
-        return res.status(500).send({
+        res.status(500).send({
             statusCode: 500,
-            message: "Oops, something went wrong",
+            message: "Internal server error",
             error: error.message
         });
     }
