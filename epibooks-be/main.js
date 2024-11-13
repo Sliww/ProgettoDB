@@ -22,7 +22,11 @@ const server = express();
 
 server.use('/uploads', express.static(path.join(__dirname, './uploads')))
 server.use(express.json());
-server.use(cors());
+server.use(cors({
+    origin: ['http://localhost:5173'],
+    methods: ['GET', 'PATCH'],
+    allowedHeaders: ['Content-Type', 'Authorization']
+}));
 
 server.use(lockIpMiddleware(notAllowedIp));
 server.use(timeForRequestMiddleware);
