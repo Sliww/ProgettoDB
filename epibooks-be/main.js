@@ -23,9 +23,8 @@ const server = express();
 server.use('/uploads', express.static(path.join(__dirname, './uploads')))
 server.use(express.json());
 server.use(cors({
-    origin: ['http://localhost:5173'],
-    methods: ['GET', 'PATCH'],
-    allowedHeaders: ['Content-Type', 'Authorization']
+    origin: ['https://epibooks-frontend.vercel.app/'],
+    methods: ['GET', 'PATCH', 'POST', 'DELETE', 'PUT']
 }));
 
 server.use(lockIpMiddleware(notAllowedIp));
