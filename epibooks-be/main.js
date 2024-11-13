@@ -16,7 +16,7 @@ const lockIpMiddleware = require('./middleware/lockIpMiddleware')
 
 const notAllowedIp = process.env.BANNEDIP ? process.env.BANNEDIP.split(',') : []
 
-const PORT = 4010 
+const PORT = process.env.PORT || 4010 
 
 const server = express();
 
