@@ -22,10 +22,7 @@ const server = express();
 
 server.use('/uploads', express.static(path.join(__dirname, './uploads')))
 server.use(express.json());
-server.use(cors({
-    origin: ['https://epibooks-frontend.vercel.app/'],
-    methods: ['GET', 'PATCH', 'POST', 'DELETE', 'PUT']
-}));
+server.use(cors());
 
 server.use(lockIpMiddleware(notAllowedIp));
 server.use(timeForRequestMiddleware);
