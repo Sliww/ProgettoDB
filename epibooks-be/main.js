@@ -8,6 +8,7 @@ const usersRoute = require('./routes/users')
 const loginRoute = require('./routes/login')
 const booksRoute = require('./routes/books')
 const commentsRoute = require('./routes/comments')
+const googleRoute = require('./routes/google')
 
 const routeNotFoundHandler = require('./middleware/routeNotFoundHandler')
 const timeForRequestMiddleware = require('./middleware/timeForRequestMiddleware')
@@ -30,6 +31,7 @@ server.use("/", usersRoute);
 server.use("/", loginRoute);
 server.use("/", booksRoute);
 server.use("/", commentsRoute);
+server.use("/", googleRoute);
 
 
 server.use(routeNotFoundHandler);
