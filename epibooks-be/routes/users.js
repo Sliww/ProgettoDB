@@ -125,4 +125,56 @@ users.delete('/users/delete/:userId', async (req, res) => {
     }
 });
 
+// PUT aggiorna utent
+users.put('/users/update/:userId', verifyToken, async (req, res) => {
+    const { userId } = req.params;
+    const updateData = req.body;
+    
+    try {
+        if (req.user.userId !== userId) {
+            return res.status(403).send({
+                statusCode: 403,
+                message: "Non hai i permessi per modificare questo profilo",
+                expected: req.user.userId,
+                received: userId
+            });
+        }
+
+        
+        const updatedUser = await UserModel.findByIdAndUpdate(
+            userId,
+            updateData,
+            { 
+                new: true, 
+                runValidators: true 
+            }
+        );
+        
+        if (!updatedUser) {
+            return res.status(404).send({
+                statusCode: 404,
+                message: "Utente non trovato"
+            });
+        }
+
+        
+        const userWithoutPassword = updatedUser.toObject();
+        delete userWithoutPassword.password;
+
+        res.status(200).send({
+            statusCode: 200,
+            message: "Utente aggiornato con successo",
+            user: userWithoutPassword
+        });
+
+    } catch (error) {
+        console.error("Errore nell'aggiornamento dell'utente:", error);
+        
+        res.status(500).send({
+            statusCode: 500,
+            message: manageErrorMessage(error)
+        });
+    }
+});
+
 module.exports = users;
